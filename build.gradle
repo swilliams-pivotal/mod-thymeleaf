@@ -38,6 +38,8 @@ dependencies {
   provided     "org.vert-x:vertx-platform:$vertxVersion"
 
   compile      "org.thymeleaf:thymeleaf:$thymeleafVersion"
+  compile      "org.slf4j:slf4j-log4j12:$slf4jVersion"
+  compile      "log4j:log4j:$log4jVersion"
 
   testCompile  "org.vert-x:vertx-junit-annotations:$junitAnnoVersion"
   testCompile  "org.vert-x:vertx-lang-java:$vertxVersion"

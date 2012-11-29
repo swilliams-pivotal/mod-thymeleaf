@@ -27,7 +27,6 @@ public class ThymeleafModTest extends VertxTestBase {
   @Before
   public void setup() {
     lightSleep(1000L);
-    throw new RuntimeException("oops");
   }
 
   @Test

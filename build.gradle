@@ -57,8 +57,6 @@ sourceSets {
   }
   vertxInteg {
     compileClasspath = configurations.vertxProvided + configurations.testCompile
-    // java.srcDirs << 'src/integTest/java'
-    // resources.srcDirs << 'src/integTest/resources'
   }
 }
 
@@ -86,30 +84,23 @@ task prepareVertxTest(type: Sync, dependsOn: 'copyMod' ) {
   into 'build/tmp/mod-test'
 }
 
-task vertxTest(type: Test, dependsOn: [ 'copyMod', 'prepareVertxTest' ]) {
+task vertxTest(type: Test, dependsOn: [ 'copyMod', 'prepareVertxTest', 'vertxIntegClasses' ]) {
+  group = 'vert.x'
+  description = 'Run vert.x integration tests'
 
-  classpath = sourceSets.vertxInteg.compileClasspath
+  systemProperty 'vertx.test.timeout', 15
+  systemProperty 'vertx.mods', "$projectDir/build/tmp/mod-test"
+  systemProperty 'vertx.version', "$project.version"
 
+  testLogging.showStandardStreams = true
+  testClassesDir = sourceSets.vertxInteg.output.classesDir
 
-
-
-  //classpath = files( classpath.findAll {
-  //  !( it.toString() ==~ /.+build\/(classes|resources)\/vertxInteg$/ )
-  //} )
-  // classpath << processVertxIntegResources
-  // classpath << vertxIntegClasses
-  // systemProperty 'vertx.test.timeout', 15
-  // systemProperty 'vertx.mods', "$projectDir/build/tmp/mod-test"
-  // systemProperty 'vertx.version', "$project.version"
-
-  // testLogging.showStandardStreams = true
-  
-  // scanForTestClasses = true
-  // testClassesDir = sourceSets.vertxInteg.output
-  // testSrcDirs = ['src/vertxInteg/java', 'src/vertxInteg/resources']
+  // Add stuff we need
+  classpath += configurations.vertxProvided + configurations.testCompile
+  classpath += files(sourceSets.vertxInteg.output.classesDir, sourceSets.vertxInteg.output.resourcesDir)
+  // remove stuff we don't want
+  classpath -= files(sourceSets.main.output.classesDir, sourceSets.main.output.resourcesDir)
 }
-
-vertxTest.testLogging.showStandardStreams = true
 
 task collectDeps(type: Copy) {
   group = 'vert.x'

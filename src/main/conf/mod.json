@@ -1,0 +1,4 @@
+{
+  "main":"org.vertx.mods.thymeleaf.ThymeleafMod",
+  "worker":true
+}

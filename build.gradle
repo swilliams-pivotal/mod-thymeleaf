@@ -25,7 +25,7 @@ targetCompatibility = '1.7'
 jar.enabled = false // We don't produce a jar
 
 configurations {
-  provided
+  vertxProvided
 }
 
 repositories {
@@ -34,8 +34,8 @@ repositories {
 }
 
 dependencies {
-  provided     "org.vert-x:vertx-core:$vertxVersion"
-  provided     "org.vert-x:vertx-platform:$vertxVersion"
+  vertxProvided "org.vert-x:vertx-core:$vertxVersion"
+  vertxProvided "org.vert-x:vertx-platform:$vertxVersion"
 
   compile      "org.thymeleaf:thymeleaf:$thymeleafVersion"
   compile      "org.slf4j:slf4j-log4j12:$slf4jVersion"
@@ -53,7 +53,12 @@ dependencies {
 
 sourceSets {
   main {
-    compileClasspath = compileClasspath + configurations.provided
+    compileClasspath = compileClasspath + configurations.vertxProvided
+  }
+  vertxInteg {
+    compileClasspath = configurations.vertxProvided + configurations.testCompile
+    // java.srcDirs << 'src/integTest/java'
+    // resources.srcDirs << 'src/integTest/resources'
   }
 }
 
@@ -67,7 +72,7 @@ task copyMod( type:Copy, dependsOn: 'classes' ) {
 }
 
 // Package into build/libs/mod.zip
-task dist( type: Zip, dependsOn: 'copyMod' ) {
+task dist(type: Zip, dependsOn: 'copyMod' ) {
   group = 'vert.x'
   description = "Assembles a vert.x module in 'mod.zip' format"
   destinationDir = project.file('build/libs')
@@ -81,24 +86,30 @@ task prepareVertxTest(type: Sync, dependsOn: 'copyMod' ) {
   into 'build/tmp/mod-test'
 }
 
-test {
-  // Can't have the app on the vert.x classpath
-  classpath = files( classpath.findAll {
-    !( it.toString() ==~ /.+build\/(classes|resources)\/main$/ )
-  } )
+task vertxTest(type: Test, dependsOn: [ 'copyMod', 'prepareVertxTest' ]) {
 
-  // Some vert.x properties
-  systemProperty 'vertx.test.timeout', 15
-  systemProperty 'vertx.mods', "$projectDir/build/tmp/mod-test"
-  systemProperty 'vertx.version', "$project.version"
+  classpath = sourceSets.vertxInteg.compileClasspath
 
-  // Show output
-  testLogging.showStandardStreams = true
 
-  // No idea why we need to depend on testClasses...
-  dependsOn << [ 'testClasses', 'copyMod', 'prepareVertxTest' ]
+
+
+  //classpath = files( classpath.findAll {
+  //  !( it.toString() ==~ /.+build\/(classes|resources)\/vertxInteg$/ )
+  //} )
+  // classpath << processVertxIntegResources
+  // classpath << vertxIntegClasses
+  // systemProperty 'vertx.test.timeout', 15
+  // systemProperty 'vertx.mods', "$projectDir/build/tmp/mod-test"
+  // systemProperty 'vertx.version', "$project.version"
+
+  // testLogging.showStandardStreams = true
+  
+  // scanForTestClasses = true
+  // testClassesDir = sourceSets.vertxInteg.output
+  // testSrcDirs = ['src/vertxInteg/java', 'src/vertxInteg/resources']
 }
 
+vertxTest.testLogging.showStandardStreams = true
 
 task collectDeps(type: Copy) {
   group = 'vert.x'

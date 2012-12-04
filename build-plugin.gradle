@@ -16,17 +16,15 @@
 
 buildscript {
   repositories {
-    mavenLocal()
-    // maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   }
   dependencies {
-    classpath "org.vert-x:gradle-plugin:1.3.0-SNAPSHOT"
+    classpath "org.vert-x:gradle-plugin:0.1-SNAPSHOT"
   }
 }
 
+apply plugin: 'java'
 apply plugin: 'vertx'
-apply plugin: 'eclipse'
 apply from: 'gradle/setup.gradle'
 
 defaultTasks = ['assemble']
@@ -37,31 +35,26 @@ targetCompatibility = '1.7'
 jar.enabled = false // We don't produce a jar
 
 repositories {
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   mavenCentral()
 }
 
 dependencies {
   vertxProvided "org.vert-x:vertx-core:$vertxVersion"
   vertxProvided "org.vert-x:vertx-platform:$vertxVersion"
-  vertxProvided "org.vert-x:vertx-lang-java:$vertxVersion"
-  vertxProvided "org.vert-x:vertx-lang-rhino:$vertxVersion"
-  vertxProvided "org.mozilla:rhino:$rhinoVersion"
 
   compile       "org.thymeleaf:thymeleaf:$thymeleafVersion"
   compile       "org.slf4j:slf4j-log4j12:$slf4jVersion"
   compile       "log4j:log4j:$log4jVersion"
 
-  testCompile   "junit:junit:$junitVersion"
-  testCompile   "org.vert-x:vertx-junit-annotations:$junitAnnoVersion"
+  vertxIntegCompile "org.vert-x:vertx-junit-annotations:$junitAnnoVersion"
+  vertxIntegCompile "org.vert-x:vertx-lang-java:$vertxVersion"
+  vertxIntegCompile "org.vert-x:vertx-lang-rhino:$vertxVersion"
+  vertxIntegCompile "org.mozilla:rhino:$rhinoVersion"
+  vertxIntegCompile "junit:junit:$junitVersion"
 }
 
-vertx {
-  testTimeout = 25
-  modsDir = 'build/tmp/mod-test'
-}
-
-vertxRunModule {
-  instances = 2
-  moduleName = "${project.modulename}-v${project.version}"
+vertxTest {
+  timeout 25
 }
 

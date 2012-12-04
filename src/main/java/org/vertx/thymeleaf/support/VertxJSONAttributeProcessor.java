@@ -32,6 +32,7 @@ public class VertxJSONAttributeProcessor extends AbstractTextChildModifierAttrPr
     return resolved;
   }
 
+  @SuppressWarnings("unchecked")
   private String resolve(String value, Map<String, Object> expressionObjects) {
 
     System.out.println("expressionObjects: " + expressionObjects);

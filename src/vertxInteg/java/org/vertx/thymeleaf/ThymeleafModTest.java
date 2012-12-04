@@ -1,5 +1,7 @@
 package org.vertx.thymeleaf;
 
+import static org.junit.Assert.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -63,10 +65,13 @@ public class ThymeleafModTest extends VertxTestBase {
       latch.await(10L, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       e.printStackTrace();
+      fail(e.getMessage());
     }
 
     String body = answers.poll();
     System.out.println("body: " + body);
+
+    assertTrue(body.indexOf("<p>SUCCEEDED</p>") > -1);
   }
 
 }

@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -16,19 +14,22 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import org.vertx.java.busmods.BusModBase;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
+
 import org.vertx.thymeleaf.support.VertxDialect;
 
 
 public class ThymeleafMod extends BusModBase {
 
+  private String DEFAULT_ADDRESS = "vertx.thymeleaf.parser";
+
   @Override
   public void start() {
     super.start();
+
+    String address = super.getOptionalStringConfig("address", DEFAULT_ADDRESS);
 
     final TemplateEngine engine = new TemplateEngine();
     engine.addDialect("vertx", new VertxDialect());
@@ -44,7 +45,8 @@ public class ThymeleafMod extends BusModBase {
     templateResolvers.add(new ClassLoaderTemplateResolver());
     engine.setTemplateResolvers(templateResolvers);
 
-    eb.registerLocalHandler("vertx.thymeleaf.parser", new Handler<Message<JsonObject>>() {
+    // Use a local handler to prevent this forcing non-local IO!
+    eb.registerLocalHandler(address, new Handler<Message<JsonObject>>() {
 
       @Override
       public void handle(Message<JsonObject> event) {
@@ -61,7 +63,6 @@ public class ThymeleafMod extends BusModBase {
         event.reply(new JsonObject().putString("body", processed));
       }
     });
-
   }
 
   @Override

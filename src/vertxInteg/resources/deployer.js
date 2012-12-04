@@ -1,9 +1,9 @@
 load('vertx.js')
 
 var config = {
-  'port': 8080
+  'address': 'vertx.thymeleaf.parser'
 }
 
-vertx.deployModule('vertx.thymeleaf-v1.0', config, 1, function() {
-  console.log('deployed module: vertx.thymeleaf-v1.0')
-});
+vertx.deployModule('vertx.thymeleaf-v1.0', config, 1, function(id) {
+  console.log('deployed module: vertx.thymeleaf-v1.0 with id:' + id)
+})

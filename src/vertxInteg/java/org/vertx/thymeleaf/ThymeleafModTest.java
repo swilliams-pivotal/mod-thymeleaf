@@ -26,6 +26,8 @@ public class ThymeleafModTest extends VertxTestBase {
 
   private static final String TEMPLATE_FILE = "test.html";
 
+  private static final long TIMEOUT = Long.getLong("vertx.test.timeout", 10);
+
   @Before
   public void setup() {
     lightSleep(1000L);
@@ -40,8 +42,6 @@ public class ThymeleafModTest extends VertxTestBase {
     varmap.put("one", "SUCCEEDED");
     varmap.put("two", new JsonObject().putString("val", "SUCCEEDED"));
     JsonObject variables = new JsonObject(varmap);
-
-    System.out.println("templateName: " + TEMPLATE_FILE);
 
     JsonObject json = new JsonObject();
     json.putString("templateName", TEMPLATE_FILE);
@@ -62,14 +62,16 @@ public class ThymeleafModTest extends VertxTestBase {
     });
 
     try {
-      latch.await(10L, TimeUnit.SECONDS);
+      System.out.printf("Waiting for response for up to %d%n", TIMEOUT);
+
+      latch.await(TIMEOUT, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
-      e.printStackTrace();
       fail(e.getMessage());
     }
 
     String body = answers.poll();
-    System.out.println("body: " + body);
+    System.out.println(body);
+    assertNotNull(body);
 
     assertTrue(body.indexOf("<p>SUCCEEDED</p>") > -1);
   }

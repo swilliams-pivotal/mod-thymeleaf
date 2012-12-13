@@ -16,8 +16,7 @@
 
 buildscript {
   repositories {
-    mavenLocal()
-    // maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     mavenCentral()
   }
   dependencies {
@@ -55,12 +54,3 @@ dependencies {
   testCompile "org.vert-x:vertx-junit-annotations:$junitAnnoVersion"
 }
 
-vertxInteg {
-  testTimeout 25
-  showStandardStreams true
-}
-
-task dist(dependsOn: ['clean', 'vertxInteg', 'vertxPackageModule']) {
-  group = 'vert.x'
-  description = 'Test and create a vert.x module in zip format'
-}

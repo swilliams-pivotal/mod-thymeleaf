@@ -34,7 +34,7 @@ public class ThymeleafModTest extends VertxTestBase {
   }
 
   @Test
-  public void testSimpleHttpTemplate() {
+  public void testSimpleEventBusTemplateTest() {
     final CountDownLatch latch = new CountDownLatch(1);
 
     Map<String, Object> varmap = new HashMap<>();

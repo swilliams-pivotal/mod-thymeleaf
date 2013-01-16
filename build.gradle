@@ -24,9 +24,10 @@ buildscript {
   }
 }
 
-apply plugin: 'vertx'
 apply plugin: 'groovy'
+apply plugin: 'vertx'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply from: 'gradle/setup.gradle'
 
 defaultTasks = ['assemble']

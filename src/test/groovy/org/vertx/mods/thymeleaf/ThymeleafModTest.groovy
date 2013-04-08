@@ -29,7 +29,7 @@ class ThymeleafModTest extends TestVerticle {
       def config = new JsonObject()
       config.putString('templates', 'src/test/resources/templates')
 
-      container.deployVerticle('groovy:org.vertx.mods.thymeleaf.ThymeleafMod', { did->
+      container.deployVerticle('groovy:'+ThymeleafMod.name, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple1', { HttpClientResponse resp->
@@ -60,7 +60,7 @@ class ThymeleafModTest extends TestVerticle {
       def config = new JsonObject()
       config.putString('templates', 'src/test/resources/templates')
 
-      container.deployVerticle('groovy:org.vertx.mods.thymeleaf.ThymeleafMod', { did->
+      container.deployVerticle('groovy:'+ThymeleafMod.name, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple2', { HttpClientResponse resp->
@@ -91,7 +91,7 @@ class ThymeleafModTest extends TestVerticle {
       def config = new JsonObject()
       config.putString('templates', 'src/test/resources/templates')
 
-      container.deployVerticle('groovy:org.vertx.mods.thymeleaf.ThymeleafMod', { did->
+      container.deployVerticle('groovy:'+ThymeleafMod.name, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple3?foo=bar', { HttpClientResponse resp->
@@ -122,7 +122,7 @@ class ThymeleafModTest extends TestVerticle {
       def config = new JsonObject()
       config.putString('templates', 'src/test/resources/templates')
 
-      container.deployVerticle('groovy:org.vertx.mods.thymeleaf.ThymeleafMod', { did->
+      container.deployVerticle('groovy:'+ThymeleafMod.name, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple4', { HttpClientResponse resp->

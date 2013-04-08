@@ -27,7 +27,7 @@ class ThymeleafModLoopTest extends TestVerticle {
       def config = new JsonObject()
       config.putString('templates', 'src/test/resources/templates')
 
-      container.deployVerticle('groovy:org.vertx.mods.thymeleaf.ThymeleafMod', { did->
+      container.deployVerticle('groovy:'+ThymeleafMod.name, { did->
 
         def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/loop1', { HttpClientResponse resp->
@@ -66,7 +66,7 @@ class ThymeleafModLoopTest extends TestVerticle {
       def config = new JsonObject()
       config.putString('templates', 'src/test/resources/templates')
 
-      container.deployVerticle('groovy:org.vertx.mods.thymeleaf.ThymeleafMod', { did->
+      container.deployVerticle('groovy:'+ThymeleafMod.name, { did->
 
         def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/loop2', { HttpClientResponse resp->

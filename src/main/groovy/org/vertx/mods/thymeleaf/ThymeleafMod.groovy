@@ -39,25 +39,30 @@ public class ThymeleafMod extends Verticle {
     this.address = container.config['address'] ?: DEFAULT_ADDRESS
     this.templateDir = container.config['templateDir'] ?: DEFAULT_TEMPLATE_DIR
 
-    String mode = container.config['mode'] ?: 'HTML5'
+    boolean cacheable = container.config['cacheable'] ?: true
+    String characterEncoding = container.config['characterEncoding'] ?: 'UTF-8'
+    String templateMode = container.config['templateMode'] ?: 'HTML5'
     String suffix = container.config['suffix'] ?: '.html'
 
+    def templateResolver = new ClassLoaderTemplateResolver()
+    templateResolver.cacheable = cacheable
+    templateResolver.characterEncoding = characterEncoding
+    templateResolver.prefix = templateDir
+    templateResolver.templateMode = templateMode
+    templateResolver.suffix = suffix
+
+    def templateResolvers = new HashSet<>()
+    templateResolvers.add(templateResolver)
+
+    def messageResolver = new StandardMessageResolver()
+
     this.engine = new TemplateEngine()
-    engine.addMessageResolver(new StandardMessageResolver())
-
-    Set<ITemplateModeHandler> modeHandlers = StandardTemplateModeHandlers.ALL_TEMPLATE_MODE_HANDLERS
-    for (ITemplateModeHandler templateModeHandler : modeHandlers) {
-      engine.addTemplateModeHandler(templateModeHandler)
-    }
-
-    ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver()
-    resolver.setPrefix(templateDir)
-    resolver.setTemplateMode(mode)
-    resolver.setSuffix(suffix)
-
-    Set<ITemplateResolver> templateResolvers = new HashSet<>()
-    templateResolvers.add(resolver)
     engine.setTemplateResolvers(templateResolvers)
+    engine.addMessageResolver(messageResolver)
+
+    for (ITemplateModeHandler tmh : StandardTemplateModeHandlers.ALL_TEMPLATE_MODE_HANDLERS) {
+      engine.addTemplateModeHandler(tmh)
+    }
 
     // we use a local handler to ensure we're not doing 
     // unnecessary IO for each template operation
@@ -77,7 +82,6 @@ public class ThymeleafMod extends Verticle {
 
     String templateName = msg.body['templateName']
     String language = msg.body['language'] ?: 'en'
-
     String templateFile = templateDir + templateName
 
     vertx.fileSystem.exists(templateFile) { AsyncResult res->

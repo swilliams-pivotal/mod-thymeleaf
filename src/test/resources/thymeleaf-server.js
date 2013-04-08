@@ -5,6 +5,7 @@ var server = vertx.createHttpServer().requestHandler(function(req) {
 
   var json = {
     templateName: req.path,
+    templateMode: 'HTML5',
     uri: req.uri,
     params: req.params(),
     headers: req.headers(),

@@ -4,12 +4,19 @@ load('vertx.js')
 var server = vertx.createHttpServer().requestHandler(function(req) {
 
   var json = {
-    templateName: req.path + '.html',
-    foo: { man: 'chu' },
-    hello: 'world',
-    path: req.uri,
+    templateName: req.path,
+    uri: req.uri,
     params: req.params(),
-    headers: req.headers()
+    headers: req.headers(),
+    hello: 'world',
+    foo: { man: 'chu' },
+    one: { two: { three: 'four' } },
+    data1: ['one', 'two', 'three'],
+    data2: [
+      {id: 1, name: 'one'},
+      {id: 2, name: 'two'},
+      {id: 3, name: 'three'}
+    ]
   }
 
   vertx.eventBus.send('vertx.thymeleaf.parser', json, function(reply) {

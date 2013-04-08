@@ -39,6 +39,9 @@ public class ThymeleafMod extends Verticle {
     this.address = container.config['address'] ?: DEFAULT_ADDRESS
     this.templateDir = container.config['templateDir'] ?: DEFAULT_TEMPLATE_DIR
 
+    String mode = container.config['mode'] ?: 'HTML5'
+    String suffix = container.config['suffix'] ?: '.html'
+
     this.engine = new TemplateEngine()
     engine.addMessageResolver(new StandardMessageResolver())
 
@@ -47,8 +50,13 @@ public class ThymeleafMod extends Verticle {
       engine.addTemplateModeHandler(templateModeHandler)
     }
 
+    ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver()
+    resolver.setPrefix(templateDir)
+    resolver.setTemplateMode(mode)
+    resolver.setSuffix(suffix)
+
     Set<ITemplateResolver> templateResolvers = new HashSet<>()
-    templateResolvers.add(new ClassLoaderTemplateResolver())
+    templateResolvers.add(resolver)
     engine.setTemplateResolvers(templateResolvers)
 
     // we use a local handler to ensure we're not doing 
@@ -70,7 +78,7 @@ public class ThymeleafMod extends Verticle {
     String templateName = msg.body['templateName']
     String language = msg.body['language'] ?: 'en'
 
-    String templateFile = templateDir + File.separator + templateName
+    String templateFile = templateDir + templateName
 
     vertx.fileSystem.exists(templateFile) { AsyncResult res->
 
@@ -79,7 +87,7 @@ public class ThymeleafMod extends Verticle {
         Context context = new Context(locale)
         context.setVariables(msg.body as Map)
 
-        rendered = engine.process(templateDir + File.separator + templateName, context)
+        rendered = engine.process(templateName, context)
         status = 200
       }
       else {

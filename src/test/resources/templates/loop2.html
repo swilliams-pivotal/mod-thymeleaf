@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <table>
+      <tr th:each="row : ${data2}">
+        <td th:text="${row.id}">row.id</td>
+        <td th:text="*{row.name}">row.name</td>
+      </tr>
+    </table>
+  </body>
+</html>

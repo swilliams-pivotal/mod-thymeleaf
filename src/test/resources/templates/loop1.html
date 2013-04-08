@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <table>
+      <tr th:each="row : ${data1}">
+        <td th:text="*{row}">row</td>
+      </tr>
+    </table>
+  </body>
+</html>

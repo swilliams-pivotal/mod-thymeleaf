@@ -18,16 +18,9 @@ import org.vertx.testtools.TestVerticle
 import org.vertx.testtools.VertxAssert;
 
 
-@RunWith(JavaClassRunner.class)
 class ThymeleafModTest extends TestVerticle {
 
   def client
-
-  @Before
-  public void setup() {
-    // client = vertx.createHttpClient().setPort(7080)
-    println "setup!"
-  }
 
   @Test
   public void testSimpleTemplate1() throws Exception {
@@ -121,10 +114,35 @@ class ThymeleafModTest extends TestVerticle {
       } as Handler)
     } as Handler)
   }
+  
+  @Test
+  public void testSimpleTemplate4() throws Exception {
+    container.deployVerticle('thymeleaf-server.js', { sid->
 
-  @After
-  public void teardown() {
-    client?.close()
+      def config = new JsonObject()
+      config.putString('templates', 'src/test/resources/templates')
+
+      container.deployVerticle('groovy:org.vertx.mods.thymeleaf.ThymeleafMod', { did->
+
+        client = vertx.createHttpClient().setPort(7080)
+        client?.getNow('/simple4', { HttpClientResponse resp->
+          resp.dataHandler({ Buffer data->
+            String rendered = data.toString()
+
+            VertxAssert.assertEquals('''<!DOCTYPE html>
+
+<html>
+  <body>
+    <p>four</p>
+  </body>
+</html>
+''', rendered)
+
+            testComplete()
+
+          } as Handler)
+        } as Handler)
+      } as Handler)
+    } as Handler)
   }
-
 }

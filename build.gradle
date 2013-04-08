@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-buildscript {
-  repositories {
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-    mavenCentral()
-  }
-  dependencies {
-    classpath "org.vert-x:gradle-plugin:1.3.0-SNAPSHOT"
-  }
-}
+//buildscript {
+//  repositories {
+//    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+//    mavenCentral()
+//  }
+//  dependencies {
+//    classpath "org.vert-x:gradle-plugin:1.3.0-SNAPSHOT"
+//  }
+//}
 
 apply plugin: 'groovy'
-apply plugin: 'vertx'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply from: 'gradle/setup.gradle'
@@ -38,16 +37,20 @@ targetCompatibility = '1.7'
 jar.enabled = false // We don't produce a jar
 
 repositories {
+  mavenLocal()
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   mavenCentral()
 }
 
+configurations {
+  provided
+  compile.extendsFrom provided
+}
+
 dependencies {
-  provided    "org.vert-x:vertx-core:$vertxVersion"
-  provided    "org.vert-x:vertx-platform:$vertxVersion"
-  provided    "org.vert-x:vertx-lang-java:$vertxVersion"
-  provided    "org.vert-x:vertx-lang-rhino:$vertxVersion"
-  provided    "org.vert-x:vertx-lang-groovy:$vertxVersion"
-  provided    "org.mozilla:rhino:$rhinoVersion"
+  provided    "io.vertx:vertx-core:$vertxVersion"
+  provided    "io.vertx:vertx-platform:$vertxVersion"
+  provided    "io.vertx:lang-groovy:1.0.0-SNAPSHOT@jar"
 
   groovy      "org.codehaus.groovy:groovy-all:$groovyVersion"
 
@@ -57,6 +60,17 @@ dependencies {
 
   testCompile "junit:junit:$junitVersion"
   testCompile "org.spockframework:spock-core:$spockVersion"
-  testCompile "org.vert-x:vertx-junit-annotations:$junitAnnoVersion"
+  testCompile "io.vertx:testtools:1.0.0-SNAPSHOT"
+
 }
 
+test {
+  systemProperty 'vertx.test.timeout', 60
+
+  // classpath -= configurations.provided
+  outputs.upToDateWhen { false }
+
+  // Show output
+  testLogging.showStandardStreams = true
+  testLogging { exceptionFormat "full" }
+}

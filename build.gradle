@@ -27,6 +27,7 @@
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply from: 'gradle/vertx.gradle'
 apply from: 'gradle/setup.gradle'
 
 defaultTasks = ['assemble']

@@ -2,9 +2,10 @@
 <html>
   <body>
     <table>
-      <tr th:each="row : ${data2}">
+      <tr th:each="row,rowStat : ${data2}">
         <td th:text="${row.id}">row.id</td>
-        <td th:text="*{row.name}">row.name</td>
+        <td th:text="${row.name}">row.name</td>
+        <td th:text="${rowStat.count}">rowStat</td>
       </tr>
     </table>
   </body>

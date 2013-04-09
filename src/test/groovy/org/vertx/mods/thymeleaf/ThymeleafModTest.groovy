@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.vertx.mods.thymeleaf
 
 import static org.vertx.testtools.VertxAssert.*
@@ -18,6 +33,10 @@ import org.vertx.testtools.TestVerticle
 import org.vertx.testtools.VertxAssert;
 
 
+/**
+ * @author swilliams
+ *
+ */
 class ThymeleafModTest extends TestVerticle {
 
   def client
@@ -26,10 +45,7 @@ class ThymeleafModTest extends TestVerticle {
   public void testSimpleTemplate1() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      def config = new JsonObject()
-      config.putString('templates', 'src/test/resources/templates')
-
-      container.deployVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple1', { HttpClientResponse resp->
@@ -57,10 +73,7 @@ class ThymeleafModTest extends TestVerticle {
   public void testSimpleTemplate2() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      def config = new JsonObject()
-      config.putString('templates', 'src/test/resources/templates')
-
-      container.deployVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple2', { HttpClientResponse resp->
@@ -88,10 +101,7 @@ class ThymeleafModTest extends TestVerticle {
   public void testSimpleTemplate3() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      def config = new JsonObject()
-      config.putString('templates', 'src/test/resources/templates')
-
-      container.deployVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple3?foo=bar', { HttpClientResponse resp->
@@ -119,10 +129,7 @@ class ThymeleafModTest extends TestVerticle {
   public void testSimpleTemplate4() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      def config = new JsonObject()
-      config.putString('templates', 'src/test/resources/templates')
-
-      container.deployVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple4', { HttpClientResponse resp->

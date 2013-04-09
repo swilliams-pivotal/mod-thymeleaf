@@ -1,39 +1,54 @@
 # mod-thymeleaf
 
-This project is used as an example of how to build vert.x modules using some of the developer support tools provided by the vert.x project.
+This vert.x module renders Thymeleaf templates by providing a local event bus address which will render a template into a page (by reply), when it receives a JSON payload.
 
-
-## gradle-plugin
-
-The vert.x Gradle plugin provides classpath management for a separate sourceSet for integration testing in combination with the vertx-junit-annotations (see below).  Add the following to the top of your build.gradle file:
-
-    buildscript {
-      repositories {
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-        mavenCentral()
-      }
-      dependencies {
-        classpath "org.vert-x:gradle-plugin:1.3.0-SNAPSHOT"
-      }
+    var config = {
+      address: 'vertx.thymeleaf.parser',
+      templateDir: 'templates',
+      templateMode: 'HTML5',
+      cacheable: true,
+      characterEncoding: 'UTF-8',
+      suffix: '.html'
     }
 
-    apply plugin: 'vertx'
+    var instances = 2
 
-The 'gradle tasks' command will show some additional tasks, but the plugin ties them into the standard Gradle 'test', 'assemble' meta-tasks so you can run 'gradle build' or 'gradle check' as you would do normally.
+    vertx.deployModule('io.vertx~thymeleaf-1.0.0-SNAPSHOT', config, instances)
 
-See the [gradle-plugin project](https://github.com/vert-x/gradle-plugin) for more information.
+The following example uses Javascript to configure a simple webserver, for each request a JSON object is created and passed to the thymeleaf parser via the event bus.  The reply object is also JSON, containing two fields, an HTTP status code and the rendered template.
 
-## vertx-junit-annotations
+    var server = vertx.createHttpServer().requestHandler(function(req) {
 
-Add JUnit and the vert.x annotation support for integration testing to your project:
+      var json = {
+        templateName: req.path,
+        uri: req.uri,
+        params: req.params(),
+        headers: req.headers(),
+        hello: 'world',
+        foo: { man: 'chu' },
+        one: { two: { three: 'four' } },
+        data1: ['one', 'two', 'three'],
+        data2: [
+          {id: 1, name: 'one'},
+          {id: 2, name: 'two'},
+          {id: 3, name: 'three'}
+        ]
+      }
 
-    dependencies {
-      ...
+      vertx.eventBus.send('vertx.thymeleaf.parser', json, function(reply) {
+        req.response.statusCode = reply.status
+        req.response.end(reply.rendered)
+      })
 
-      testCompile "junit:junit:$junitVersion"
-      testCompile "org.vert-x:vertx-junit-annotations:$junitAnnoVersion"
-    }
+    }).listen(7080)
 
-See the [vertx-junit-annotations](https://github.com/vert-x/vertx-junit-annotations) for more information.
+The complex JSON object `one: { two: { three: 'four' } }` is accessed in a template, as below, using `one.two.three`.
 
+    <!DOCTYPE html>
+    <html>
+      <body>
+        <p th:text="${one.two.three}">Original</p>
+      </body>
+    </html>
 
+See the examples in the module tests for how each of the above components of the JSON payload are rendered.

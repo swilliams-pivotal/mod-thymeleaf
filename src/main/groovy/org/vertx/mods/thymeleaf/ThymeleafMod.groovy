@@ -70,8 +70,8 @@ public class ThymeleafMod extends Verticle {
     def templateResolvers = new HashSet<>()
     templateResolvers.add(templateResolver)
 
-    StandardMessageResolver messageResolver = new StandardMessageResolver()
-    messageResolver.
+    def messageResolver = new StandardMessageResolver()
+    // TODO permit alternative property loading
 
     this.engine = new TemplateEngine()
     engine.setTemplateResolvers(templateResolvers)

@@ -45,7 +45,7 @@ class ThymeleafModTest extends TestVerticle {
   public void testSimpleTemplate1() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple1', { HttpClientResponse resp->
@@ -73,7 +73,7 @@ class ThymeleafModTest extends TestVerticle {
   public void testSimpleTemplate2() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple2', { HttpClientResponse resp->
@@ -101,7 +101,7 @@ class ThymeleafModTest extends TestVerticle {
   public void testSimpleTemplate3() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple3?foo=bar', { HttpClientResponse resp->
@@ -129,7 +129,7 @@ class ThymeleafModTest extends TestVerticle {
   public void testSimpleTemplate4() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple4', { HttpClientResponse resp->

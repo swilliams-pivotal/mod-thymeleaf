@@ -44,7 +44,7 @@ class ThymeleafModPropsTest extends TestVerticle {
   public void testProps1() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/props1', { HttpClientResponse resp->

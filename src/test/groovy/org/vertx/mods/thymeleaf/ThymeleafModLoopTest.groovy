@@ -43,7 +43,7 @@ class ThymeleafModLoopTest extends TestVerticle {
   public void testLoopTemplate1() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
 
         def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/loop1', { HttpClientResponse resp->
@@ -79,7 +79,7 @@ class ThymeleafModLoopTest extends TestVerticle {
   public void testLoopTemplate2() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
 
         def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/loop2', { HttpClientResponse resp->

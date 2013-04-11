@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.vertx.mods.thymeleaf
+package io.vertx.mods.thymeleaf
 
 import static org.vertx.testtools.VertxAssert.*
 
@@ -32,21 +32,22 @@ import org.vertx.testtools.JavaClassRunner;
 import org.vertx.testtools.TestVerticle
 import org.vertx.testtools.VertxAssert;
 
-
 /**
  * @author swilliams
  *
  */
-class ThymeleafModLoopTest extends TestVerticle {
+class ThymeleafModPropsTest extends TestVerticle {
+
+  def client
 
   @Test
-  public void testLoopTemplate1() throws Exception {
+  public void testProps1() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
       container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
 
-        def client = vertx.createHttpClient().setPort(7080)
-        client?.getNow('/loop1', { HttpClientResponse resp->
+        client = vertx.createHttpClient().setPort(7080)
+        client?.getNow('/props1', { HttpClientResponse resp->
           resp.dataHandler({ Buffer data->
             String rendered = data.toString()
 
@@ -54,57 +55,9 @@ class ThymeleafModLoopTest extends TestVerticle {
 
 <html>
   <body>
-    <table>
-      <tr>
-        <td>one</td>
-      </tr><tr>
-        <td>two</td>
-      </tr><tr>
-        <td>three</td>
-      </tr>
-    </table>
-  </body>
-</html>
-''', rendered)
-
-            testComplete()
-
-          } as Handler)
-        } as Handler)
-      } as Handler)
-    } as Handler)
-  }
-
-  @Test
-  public void testLoopTemplate2() throws Exception {
-    container.deployVerticle('thymeleaf-server.js', { sid->
-
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
-
-        def client = vertx.createHttpClient().setPort(7080)
-        client?.getNow('/loop2', { HttpClientResponse resp->
-          resp.dataHandler({ Buffer data->
-            String rendered = data.toString()
-
-            VertxAssert.assertEquals('''<!DOCTYPE html>
-
-<html>
-  <body>
-    <table>
-      <tr>
-        <td>1</td>
-        <td>one</td>
-        <td>1</td>
-      </tr><tr>
-        <td>2</td>
-        <td>two</td>
-        <td>2</td>
-      </tr><tr>
-        <td>3</td>
-        <td>three</td>
-        <td>3</td>
-      </tr>
-    </table>
+    <p>world</p>
+    <p>bar</p>
+    <p>chu</p>
   </body>
 </html>
 ''', rendered)

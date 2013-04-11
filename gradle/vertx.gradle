@@ -78,7 +78,6 @@ task zipMod(type: Zip, dependsOn:['makeMod']) {
   from "build/mod/$modulePackageName"
 
   archiveName = "${project.moduleName}-${project.version}.zip"
-  // includes = ["$modulePackageName"]
 }
 
 artifacts {

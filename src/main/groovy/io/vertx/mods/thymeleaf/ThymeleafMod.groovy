@@ -71,7 +71,7 @@ public class ThymeleafMod extends Verticle {
     templateResolvers.add(templateResolver)
 
     def messageResolver = new StandardMessageResolver()
-    // TODO permit alternative property loading
+    // TODO permit alternative message property loading
 
     this.engine = new TemplateEngine()
     engine.setTemplateResolvers(templateResolvers)

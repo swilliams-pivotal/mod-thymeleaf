@@ -1,4 +1,4 @@
 {
-  "main":"io.vertx.mods.thymeleaf.ThymeleafMod",
+  "main":"groovy:io.vertx.mods.thymeleaf.ThymeleafMod",
   "worker":true
 }

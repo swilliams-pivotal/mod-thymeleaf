@@ -76,6 +76,7 @@ class ThymeleafWebServer extends WebServerBase {
       } as Handler)
     } as Handler)
 
+    // send all non-matches to the webserver
     rm.noMatch(new StaticHttpResourceHandler(vertx.fileSystem(), getWebRootPrefix(), getIndexPage(), isGzipFiles()))
 
     return rm

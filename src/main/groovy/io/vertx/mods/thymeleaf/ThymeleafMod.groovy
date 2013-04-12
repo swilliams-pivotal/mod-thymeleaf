@@ -49,6 +49,8 @@ public class ThymeleafMod extends Verticle {
 
   private TemplateEngine engine
 
+  private Map<String, Locale> localeCache = [:]
+
   @Override
   def start(VoidResult result) {
 
@@ -104,7 +106,14 @@ public class ThymeleafMod extends Verticle {
     vertx.fileSystem.exists(templateFile) { AsyncResult res->
 
       if (res.succeeded()) {
-        Locale locale = new Locale.Builder().setLanguage(language).build()
+        Locale locale
+        if (localeCache.containsKey(language)) {
+          locale = localeCache.get(language)
+        }
+        else {
+          locale = buildLocale(language)
+        }
+
         Context context = new Context(locale)
         context.setVariables(msg.body as Map)
 
@@ -118,6 +127,10 @@ public class ThymeleafMod extends Verticle {
 
       msg.reply([status: status, rendered: rendered])
     }
+  }
+
+  def buildLocale(String language) {
+    new Locale.Builder().setLanguage(language).build()
   }
 
 }

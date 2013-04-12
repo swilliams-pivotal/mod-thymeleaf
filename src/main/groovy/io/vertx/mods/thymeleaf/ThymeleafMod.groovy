@@ -112,6 +112,7 @@ public class ThymeleafMod extends Verticle {
         }
         else {
           locale = buildLocale(language)
+          localeCache.put(language, locale)
         }
 
         Context context = new Context(locale)

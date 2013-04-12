@@ -37,7 +37,7 @@ import org.vertx.java.core.VoidResult
  * @author swilliams
  *
  */
-public class ThymeleafMod extends Verticle {
+public class ThymeleafTemplateParser extends Verticle {
 
   public static final String DEFAULT_ADDRESS = 'vertx.thymeleaf.parser'
 

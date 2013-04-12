@@ -39,15 +39,13 @@ import org.vertx.testtools.VertxAssert;
  */
 class ThymeleafModTest extends TestVerticle {
 
-  def client
-
   @Test
   public void testSimpleTemplate1() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
 
-        client = vertx.createHttpClient().setPort(7080)
+        def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple1', { HttpClientResponse resp->
           resp.dataHandler({ Buffer data->
             String rendered = data.toString()
@@ -68,14 +66,14 @@ class ThymeleafModTest extends TestVerticle {
       } as Handler)
     } as Handler)
   }
-  
+
   @Test
   public void testSimpleTemplate2() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
 
-        client = vertx.createHttpClient().setPort(7080)
+        def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple2', { HttpClientResponse resp->
           resp.dataHandler({ Buffer data->
             String rendered = data.toString()
@@ -101,9 +99,9 @@ class ThymeleafModTest extends TestVerticle {
   public void testSimpleTemplate3() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
 
-        client = vertx.createHttpClient().setPort(7080)
+        def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple3?foo=bar', { HttpClientResponse resp->
           resp.dataHandler({ Buffer data->
             String rendered = data.toString()
@@ -129,9 +127,9 @@ class ThymeleafModTest extends TestVerticle {
   public void testSimpleTemplate4() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafMod.name, new JsonObject(), 1, false, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
 
-        client = vertx.createHttpClient().setPort(7080)
+        def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple4', { HttpClientResponse resp->
           resp.dataHandler({ Buffer data->
             String rendered = data.toString()

@@ -38,7 +38,7 @@ targetCompatibility = '1.7'
 jar.enabled = false // We don't produce a jar
 
 repositories {
-  mavenLocal()
+  // mavenLocal()
   maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   mavenCentral()
 }
@@ -52,6 +52,7 @@ dependencies {
   provided    "io.vertx:vertx-core:$vertxVersion"
   provided    "io.vertx:vertx-platform:$vertxVersion"
   provided    "io.vertx:lang-groovy:1.0.0-SNAPSHOT@jar"
+  provided    "io.vertx:web-server-base:1.0.0-SNAPSHOT@jar"
   provided    "org.codehaus.groovy:groovy-all:$groovyVersion"
 
   compile     "org.thymeleaf:thymeleaf:$thymeleafVersion"
@@ -61,7 +62,6 @@ dependencies {
   testCompile "junit:junit:$junitVersion"
   testCompile "org.spockframework:spock-core:$spockVersion"
   testCompile "io.vertx:testtools:1.0.0-SNAPSHOT"
-
 }
 
 task cleanMods(type: Delete) {

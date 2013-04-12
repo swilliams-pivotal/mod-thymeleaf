@@ -64,6 +64,12 @@ dependencies {
 
 }
 
+task cleanMods(type: Delete) {
+  delete 'mods'
+}
+
+clean.dependsOn cleanMods
+
 test {
   systemProperty 'vertx.test.timeout', 60
 
@@ -75,12 +81,12 @@ test {
   testLogging { exceptionFormat "full" }
 }
 
-task publishSnapshot(dependsOn: ['clean','check','publishMavenPublicationToSnapshotsRepository']) {
+task publishSnapshot(dependsOn: ['check', 'publishMavenPublicationToSnapshotsRepository']) {
   description = 'Publish to Maven Central (Snapshot) Repo'
   group = 'vert.x'
 }
 
-task publishRelease(dependsOn: ['clean','check','publishMavenPublicationToStagingRepository']) {
+task publishRelease(dependsOn: ['check', 'publishMavenPublicationToStagingRepository']) {
   description = 'Publish to Maven Central (Staging) Repo'
   group = 'vert.x'
 

@@ -46,19 +46,27 @@ publishing {
   publications {
     maven(MavenPublication) {
       mavenProjectIdentity.artifactId = project.moduleName
-      artifact("build/libs/${project.moduleName}-${project.version}.zip") {
+      artifact zipMod {
         extension "zip"
-        builtBy zipMod
       }
-    }
-    mavenJar(MavenPublication) {
-      mavenProjectIdentity.artifactId = project.moduleName
-      from components.java
+      artifact jar {
+        classifier 'dep'
+      }
+      artifact sourceJar {
+        classifier 'sources'
+      }
     }
   }
 }
 
-// jar.enabled = false
+task sourceJar(type: Jar) {
+  baseName project.moduleName
+  from sourceSets.main.allJava
+}
+
+jar {
+  baseName project.moduleName
+}
 
 task makeMod(type: Copy) {
   destinationDir mkdir("build/mod/$modulePackageName")

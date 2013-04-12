@@ -35,7 +35,7 @@ defaultTasks = ['assemble']
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
-jar.enabled = false // We don't produce a jar
+// jar.enabled = false // We don't produce a jar
 
 repositories {
   // mavenLocal()
@@ -52,8 +52,8 @@ dependencies {
   provided    "io.vertx:vertx-core:$vertxVersion"
   provided    "io.vertx:vertx-platform:$vertxVersion"
   provided    "io.vertx:lang-groovy:1.0.0-SNAPSHOT@jar"
-  provided    "io.vertx:web-server-base:1.0.0-SNAPSHOT@jar"
   provided    "org.codehaus.groovy:groovy-all:$groovyVersion"
+  provided    "io.vertx:web-server-base:1.0.0-SNAPSHOT:dep@jar"
 
   compile     "org.thymeleaf:thymeleaf:$thymeleafVersion"
   compile     "org.slf4j:slf4j-log4j12:$slf4jVersion"
@@ -89,6 +89,5 @@ task publishSnapshot(dependsOn: ['check', 'publishMavenPublicationToSnapshotsRep
 task publishRelease(dependsOn: ['check', 'publishMavenPublicationToStagingRepository']) {
   description = 'Publish to Maven Central (Staging) Repo'
   group = 'vert.x'
-
 }
 

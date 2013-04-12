@@ -65,7 +65,7 @@ class ThymeleafWebServer extends WebServerBase {
       msg.putObject('params', new JsonObject(new HashMap<String,Object>(req.params())))
       msg.putObject('headers', new JsonObject(new HashMap<String,Object>(req.headers())))
 
-      vertx.eventBus().send(parserAddress, msg, { Message event->
+      vertx.eventBus().send(parserAddress, prepareParams(req, msg), { Message event->
 
         def body = ((JsonObject) event.body).toMap()
         int statusCode = body['status'] as int
@@ -79,6 +79,10 @@ class ThymeleafWebServer extends WebServerBase {
     rm.noMatch(new StaticHttpResourceHandler(vertx.fileSystem(), getWebRootPrefix(), getIndexPage(), isGzipFiles()))
 
     return rm
+  }
+
+  protected JsonObject prepareParams(HttpServerRequest req, JsonObject msg) {
+    msg
   }
 
 }

@@ -51,10 +51,14 @@ publishing {
         builtBy zipMod
       }
     }
+    mavenJar(MavenPublication) {
+      mavenProjectIdentity.artifactId = project.moduleName
+      from components.java
+    }
   }
 }
 
-jar.enabled = false
+// jar.enabled = false
 
 task makeMod(type: Copy) {
   destinationDir mkdir("build/mod/$modulePackageName")
@@ -81,7 +85,7 @@ task zipMod(type: Zip, dependsOn:['makeMod']) {
 }
 
 artifacts {
-  archives zipMod
+  archives zipMod, jar
 }
 
 

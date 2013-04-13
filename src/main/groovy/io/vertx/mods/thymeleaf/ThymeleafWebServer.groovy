@@ -40,8 +40,9 @@ class ThymeleafWebServer extends WebServerBase {
 
   String regex
   String match
+  String preParser
   String parser
-
+  
   @Override
   public void start() {
     container.deployWorkerVerticle('groovy:io.vertx.mods.thymeleaf.ThymeleafTemplateParser', config, 1, false, { String did->
@@ -49,10 +50,11 @@ class ThymeleafWebServer extends WebServerBase {
     } as Handler)
     super.start()
 
-    regex = getMandatoryStringConfig('regex')
-    match = getOptionalStringConfig('match', '$1')
-    parser = getOptionalStringConfig('address', ThymeleafTemplateParser.DEFAULT_ADDRESS)
-    config.putBoolean('route_matcher', true)
+    this.regex = getMandatoryStringConfig('regex')
+    this.match = getOptionalStringConfig('match', '$1')
+    this.preParser = getOptionalStringConfig('pre-parser', null)
+    this.parser = getOptionalStringConfig('parser', ThymeleafTemplateParser.DEFAULT_ADDRESS)
+    this.config.putBoolean('route_matcher', true)
   }
 
   protected final RouteMatcher routeMatcher() {
@@ -69,9 +71,12 @@ class ThymeleafWebServer extends WebServerBase {
       msg.putObject('params', new JsonObject(new HashMap<String,Object>(req.params())))
       msg.putObject('headers', new JsonObject(new HashMap<String,Object>(req.headers())))
 
-      def internal = this.&sendToParserEndReply
-      def callback = internal.curry(req)
-      getRequestParameters(msg, callback)
+      if (!!this.preParser) {
+        sendToPreParserEndReply(req, msg)
+      }
+      else {
+        handleRequest(req, msg)
+      }
 
     } as Handler)
 
@@ -79,6 +84,19 @@ class ThymeleafWebServer extends WebServerBase {
     rm.noMatch(new StaticHttpResourceHandler(vertx.fileSystem(), getWebRootPrefix(), getIndexPage(), isGzipFiles()))
 
     return rm
+  }
+
+  private final void handleRequest(HttpServerRequest req, JsonObject msg) {
+    def internal = this.&sendToParserEndReply
+    def callback = internal.curry(req)
+    getRequestParameters(msg, callback)
+  }
+
+  private final void sendToPreParserEndReply(HttpServerRequest req, JsonObject msg) {
+    vertx.eventBus().send(preParser, msg, { Message event->
+      def reply = event.body as JsonObject
+      handleRequest(req, reply)
+    } as Handler)
   }
 
   private final void sendToParserEndReply(HttpServerRequest req, JsonObject msg) {

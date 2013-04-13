@@ -9,6 +9,7 @@ import org.vertx.java.core.json.JsonObject
 import org.vertx.testtools.TestVerticle
 import org.vertx.testtools.VertxAssert
 
+
 public class ThymeleafWebServerTest extends TestVerticle {
 
   @Test

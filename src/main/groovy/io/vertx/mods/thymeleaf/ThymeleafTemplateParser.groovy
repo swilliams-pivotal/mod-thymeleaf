@@ -21,6 +21,7 @@ import java.util.Map
 import java.util.Set
 
 import org.thymeleaf.TemplateEngine
+import org.thymeleaf.exceptions.TemplateEngineException
 import org.thymeleaf.context.Context
 import org.thymeleaf.messageresolver.StandardMessageResolver
 import org.thymeleaf.templatemode.ITemplateModeHandler
@@ -97,7 +98,7 @@ public class ThymeleafTemplateParser extends Verticle {
 
   def processor(Message msg) {
     int status = 500
-    String rendered = 'Unknown error'
+    String rendered = errorHtml('Unknown error')
 
     String templateName = msg.body['templateName']
     String language = msg.body['language'] ?: 'en'
@@ -118,11 +119,17 @@ public class ThymeleafTemplateParser extends Verticle {
         Context context = new Context(locale)
         context.setVariables(msg.body as Map)
 
-        rendered = engine.process(templateName, context)
-        status = 200
+        try {
+          rendered = engine.process(templateName, context)
+          status = 200
+        }
+        catch (TemplateEngineException e) {
+          rendered = errorHtml(e.message)
+          status = 500
+        }
       }
       else {
-        rendered = 'Not Found'
+        rendered = errorHtml('Not Found')
         status = 404
       }
 
@@ -132,6 +139,17 @@ public class ThymeleafTemplateParser extends Verticle {
 
   def buildLocale(String language) {
     new Locale.Builder().setLanguage(language).build()
+  }
+
+  def errorHtml(String message) {
+    """
+<!DOCTYPE html>
+    <html>
+      <body>
+        <p>${message}</p>
+      </body>
+    </html>
+"""
   }
 
 }

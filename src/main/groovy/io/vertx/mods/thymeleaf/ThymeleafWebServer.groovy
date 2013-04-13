@@ -38,20 +38,24 @@ import org.vertx.java.core.json.JsonObject
 @CompileStatic
 class ThymeleafWebServer extends WebServerBase {
 
+  String regex
+  String match
+  String parser
+
   @Override
   public void start() {
     container.deployWorkerVerticle('groovy:io.vertx.mods.thymeleaf.ThymeleafTemplateParser', config, 1, false, { String did->
       //
     } as Handler)
     super.start()
+
+    regex = getMandatoryStringConfig('regex')
+    match = getOptionalStringConfig('match', '$1')
+    parser = getOptionalStringConfig('address', ThymeleafTemplateParser.DEFAULT_ADDRESS)
     config.putBoolean('route_matcher', true)
   }
 
-  protected RouteMatcher routeMatcher() {
-
-    String regex = getMandatoryStringConfig('regex')
-    String match = getOptionalStringConfig('match', '$1')
-    String parserAddress = getOptionalStringConfig('address', ThymeleafTemplateParser.DEFAULT_ADDRESS)
+  protected final RouteMatcher routeMatcher() {
 
     def rm = new RouteMatcher()
     rm.allWithRegEx(regex, { HttpServerRequest req->
@@ -65,15 +69,10 @@ class ThymeleafWebServer extends WebServerBase {
       msg.putObject('params', new JsonObject(new HashMap<String,Object>(req.params())))
       msg.putObject('headers', new JsonObject(new HashMap<String,Object>(req.headers())))
 
-      vertx.eventBus().send(parserAddress, prepareParams(req, msg), { Message event->
+      def internal = this.&sendToParserEndReply
+      def callback = internal.curry(req)
+      getRequestParameters(msg, callback)
 
-        def body = ((JsonObject) event.body).toMap()
-        int statusCode = body['status'] as int
-        String chunk = body['rendered']
-        req.response.statusCode = statusCode
-        req.response.end(chunk)
-
-      } as Handler)
     } as Handler)
 
     // send all non-matches to the webserver
@@ -82,8 +81,27 @@ class ThymeleafWebServer extends WebServerBase {
     return rm
   }
 
-  protected JsonObject prepareParams(HttpServerRequest req, JsonObject msg) {
-    msg
+  private final void sendToParserEndReply(HttpServerRequest req, JsonObject msg) {
+    vertx.eventBus().send(parser, msg, { Message event->
+
+      def body = ((JsonObject) event.body).toMap()
+      int statusCode = body['status'] as int
+      String chunk = body['rendered']
+      req.response.statusCode = statusCode
+      req.response.end(chunk)
+
+    } as Handler)
+  }
+
+  /**
+   * Extendable method for customising the data sent to the template
+   * parser
+   * 
+   * @param msg
+   * @param callback
+   */
+  protected void getRequestParameters(JsonObject msg, Closure callback) {
+    callback.call(msg)
   }
 
 }

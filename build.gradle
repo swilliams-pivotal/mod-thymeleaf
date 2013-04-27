@@ -53,7 +53,7 @@ dependencies {
   provided    "io.vertx:vertx-platform:$vertxVersion"
   provided    "io.vertx:lang-groovy:1.0.0-SNAPSHOT@jar"
   provided    "org.codehaus.groovy:groovy-all:$groovyVersion"
-  provided    "io.vertx:web-server-base:1.0.0-SNAPSHOT:dep@jar"
+  provided    "io.vertx:mod-web-server:2.0.0-SNAPSHOT"
 
   compile     "org.thymeleaf:thymeleaf:$thymeleafVersion"
   compile     "org.slf4j:slf4j-log4j12:$slf4jVersion"
@@ -72,7 +72,8 @@ clean.dependsOn cleanMods
 
 test {
   systemProperty 'vertx.test.timeout', 60
-
+  systemProperty 'vertx.mods', 'build/mods'
+  
   // classpath -= configurations.provided
   outputs.upToDateWhen { false }
 

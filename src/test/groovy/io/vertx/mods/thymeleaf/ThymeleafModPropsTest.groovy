@@ -24,6 +24,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith;
+import org.vertx.java.core.AsyncResult
 import org.vertx.java.core.Handler
 import org.vertx.java.core.buffer.Buffer
 import org.vertx.java.core.http.HttpClientResponse
@@ -44,7 +45,7 @@ class ThymeleafModPropsTest extends TestVerticle {
   public void testProps1() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { AsyncResult did->
 
         client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/props1', { HttpClientResponse resp->

@@ -24,6 +24,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith;
+import org.vertx.java.core.AsyncResult
 import org.vertx.java.core.Handler
 import org.vertx.java.core.buffer.Buffer
 import org.vertx.java.core.http.HttpClientResponse
@@ -43,8 +44,18 @@ class ThymeleafModLoopTest extends TestVerticle {
   public void testLoopTemplate1() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
+      VertxAssert.assertTrue(sid.succeeded())
+      if (sid.failed()) {
+        sid.cause().printStackTrace()
+      }
 
+      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { AsyncResult did->
+
+        VertxAssert.assertTrue(did.succeeded())
+        if (did.failed()) {
+          did.cause().printStackTrace()
+        }
+  
         def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/loop1', { HttpClientResponse resp->
           resp.dataHandler({ Buffer data->
@@ -79,7 +90,7 @@ class ThymeleafModLoopTest extends TestVerticle {
   public void testLoopTemplate2() throws Exception {
     container.deployVerticle('thymeleaf-server.js', { sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { AsyncResult did->
 
         def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/loop2', { HttpClientResponse resp->

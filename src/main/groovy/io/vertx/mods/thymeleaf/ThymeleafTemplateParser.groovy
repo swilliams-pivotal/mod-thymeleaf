@@ -20,6 +20,8 @@ import java.util.Locale
 import java.util.Map
 import java.util.Set
 
+import groovy.transform.CompileStatic
+
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.exceptions.TemplateEngineException
 import org.thymeleaf.context.Context
@@ -32,45 +34,44 @@ import org.thymeleaf.templateresolver.ITemplateResolver
 import org.vertx.groovy.core.eventbus.Message
 import org.vertx.groovy.platform.Verticle
 import org.vertx.java.core.AsyncResult
-import org.vertx.java.core.VoidResult
+import org.vertx.java.core.Future
+
 
 /**
  * @author swilliams
  *
  */
+@CompileStatic
 public class ThymeleafTemplateParser extends Verticle {
 
   public static final String DEFAULT_ADDRESS = 'vertx.thymeleaf.parser'
-
   public static final String DEFAULT_TEMPLATE_DIR = 'templates'
-
-  private String address
-
-  private String templateDir
-
-  private TemplateEngine engine
 
   private Map<String, Locale> localeCache = [:]
 
+  private String address
+  private String templateDir
+  private TemplateEngine engine
+
   @Override
-  def start(VoidResult result) {
+  def start(Future<Void> result) {
 
     this.address = container.config['address'] ?: DEFAULT_ADDRESS
     this.templateDir = container.config['templateDir'] ?: DEFAULT_TEMPLATE_DIR
-    String templateMode = container.config['templateMode'] ?: 'HTML5'
+    // String templateMode = container.config['templateMode'] ?: 'HTML5'
 
-    boolean cacheable = container.config['cacheable'] ?: true
-    String characterEncoding = container.config['characterEncoding'] ?: 'UTF-8'
-    String suffix = container.config['suffix'] ?: '.html'
+    // boolean cacheable = container.config['cacheable'] as boolean ?: true
+    // String characterEncoding = container.config['characterEncoding'] ?: 'UTF-8'
+    // String suffix = container.config['suffix'] ?: '.html'
 
     def templateResolver = new ClassLoaderTemplateResolver()
-    templateResolver.cacheable = cacheable
-    templateResolver.characterEncoding = characterEncoding
+    templateResolver.cacheable = container.config['cacheable'] as boolean ?: true
+    templateResolver.characterEncoding = container.config['characterEncoding'] ?: 'UTF-8'
     templateResolver.prefix = templateDir
-    templateResolver.templateMode = templateMode
-    templateResolver.suffix = suffix
+    templateResolver.templateMode = container.config['templateMode'] ?: 'HTML5'
+    templateResolver.suffix = container.config['suffix'] ?: '.html'
 
-    def templateResolvers = new HashSet<>()
+    def templateResolvers = new HashSet<ITemplateResolver>()
     templateResolvers.add(templateResolver)
 
     def messageResolver = new StandardMessageResolver()
@@ -88,11 +89,11 @@ public class ThymeleafTemplateParser extends Verticle {
     // unnecessary IO for each template operation
     vertx.eventBus.registerLocalHandler(address, this.&processor)
 
-    result.setResult()
+    result.setResult(null)
   }
 
   @Override
-  def stop() throws Exception {
+  def stop() {
     vertx.eventBus.unregisterHandler(address, this.&processor)
   }
 
@@ -137,7 +138,7 @@ public class ThymeleafTemplateParser extends Verticle {
     }
   }
 
-  def buildLocale(String language) {
+  private Locale buildLocale(String language) {
     new Locale.Builder().setLanguage(language).build()
   }
 

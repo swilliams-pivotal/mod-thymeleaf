@@ -24,6 +24,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith;
+import org.vertx.java.core.AsyncResult
 import org.vertx.java.core.Handler
 import org.vertx.java.core.buffer.Buffer
 import org.vertx.java.core.http.HttpClientResponse
@@ -41,9 +42,21 @@ class ThymeleafModTest extends TestVerticle {
 
   @Test
   public void testSimpleTemplate1() throws Exception {
-    container.deployVerticle('thymeleaf-server.js', { sid->
+    container.deployVerticle('thymeleaf-server.js', { AsyncResult sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
+      if (sid.failed()) {
+        sid.cause().printStackTrace()
+      }
+
+      VertxAssert.assertTrue(sid.succeeded())
+
+      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { AsyncResult did->
+
+      if (did.failed()) {
+        did.cause().printStackTrace()
+      }
+
+      VertxAssert.assertTrue(did.succeeded())
 
         def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple1', { HttpClientResponse resp->
@@ -69,9 +82,9 @@ class ThymeleafModTest extends TestVerticle {
 
   @Test
   public void testSimpleTemplate2() throws Exception {
-    container.deployVerticle('thymeleaf-server.js', { sid->
+    container.deployVerticle('thymeleaf-server.js', { AsyncResult sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { AsyncResult did->
 
         def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple2', { HttpClientResponse resp->
@@ -97,7 +110,7 @@ class ThymeleafModTest extends TestVerticle {
 
   @Test
   public void testSimpleTemplate3() throws Exception {
-    container.deployVerticle('thymeleaf-server.js', { sid->
+    container.deployVerticle('thymeleaf-server.js', { AsyncResult sid->
 
       container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
 
@@ -125,9 +138,9 @@ class ThymeleafModTest extends TestVerticle {
   
   @Test
   public void testSimpleTemplate4() throws Exception {
-    container.deployVerticle('thymeleaf-server.js', { sid->
+    container.deployVerticle('thymeleaf-server.js', { AsyncResult sid->
 
-      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { did->
+      container.deployWorkerVerticle('groovy:'+ThymeleafTemplateParser.name, new JsonObject(), 1, false, { AsyncResult did->
 
         def client = vertx.createHttpClient().setPort(7080)
         client?.getNow('/simple4', { HttpClientResponse resp->

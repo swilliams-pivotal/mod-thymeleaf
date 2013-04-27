@@ -2,6 +2,7 @@ package io.vertx.mods.thymeleaf
 
 import static org.vertx.testtools.VertxAssert.*
 import org.junit.Test
+import org.vertx.java.core.AsyncResult
 import org.vertx.java.core.Handler
 import org.vertx.java.core.buffer.Buffer
 import org.vertx.java.core.http.HttpClientResponse
@@ -21,10 +22,10 @@ public class ThymeleafWebServerTest extends TestVerticle {
       port: 7081,
       regex: '/foo/(.*)\\.html',
       match: '/$1',
-      templateDir: 'src/test/resource/templates'
+      templateDir: 'templates'
     ]
 
-    container.deployVerticle('groovy:io.vertx.mods.thymeleaf.ThymeleafWebServer', new JsonObject(conf), 1, { String did->
+    container.deployVerticle('groovy:io.vertx.mods.thymeleaf.ThymeleafWebServer', new JsonObject(conf), 1, { AsyncResult did->
 
         def client = vertx.createHttpClient().setPort(7081)
         client?.getNow('/foo/web1.html', { HttpClientResponse resp->
@@ -60,10 +61,16 @@ public class ThymeleafWebServerTest extends TestVerticle {
       web_root: 'src/test/resources/webroot',
       regex: '/foo/(.*)\\.html',
       match: '/$1',
-      templateDir: 'src/test/resource/templates'
+      templateDir: 'templates'
     ]
 
-    container.deployVerticle('groovy:io.vertx.mods.thymeleaf.ThymeleafWebServer', new JsonObject(conf), 1, { String did->
+    container.deployVerticle('groovy:io.vertx.mods.thymeleaf.ThymeleafWebServer', new JsonObject(conf), 1, { AsyncResult did->
+
+      if (did.failed()) {
+        did.cause().printStackTrace()
+      }
+
+      VertxAssert.assertTrue(did.succeeded())
 
         def client = vertx.createHttpClient().setPort(7081)
         client?.getNow('/flat1.html', { HttpClientResponse resp->

@@ -1,5 +1,5 @@
 {
   "main":"groovy:io.vertx.mods.thymeleaf.ThymeleafWebServer",
-  "includes": "io.vertx~web-server-base-1.0.0-SNAPSHOT",
+  "includes": "io.vertx~mod-web-server-2.0.0-SNAPSHOT",
   "worker":true
 }

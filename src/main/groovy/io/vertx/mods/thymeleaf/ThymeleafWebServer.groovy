@@ -16,15 +16,16 @@
 
 package io.vertx.mods.thymeleaf
 
-import io.vertx.mods.webserver.base.StaticHttpResourceHandler
-import io.vertx.mods.webserver.base.WebServerBase
+import org.vertx.mods.StaticFileHandler
+import org.vertx.mods.WebServerBase
 
 import java.util.HashMap
 
 import groovy.transform.CompileStatic
 
+import org.vertx.java.core.AsyncResult
+import org.vertx.java.core.Future
 import org.vertx.java.core.Handler
-import org.vertx.java.core.VoidResult
 import org.vertx.java.core.eventbus.Message
 import org.vertx.java.core.http.HttpServerRequest
 import org.vertx.java.core.http.RouteMatcher
@@ -42,12 +43,9 @@ class ThymeleafWebServer extends WebServerBase {
   String match
   String preParser
   String parser
-  
+
   @Override
-  public void start() {
-    container.deployWorkerVerticle('groovy:io.vertx.mods.thymeleaf.ThymeleafTemplateParser', config, 1, false, { String did->
-      //
-    } as Handler)
+  public void start(Future<Void> result) {
     super.start()
 
     this.regex = getMandatoryStringConfig('regex')
@@ -55,24 +53,30 @@ class ThymeleafWebServer extends WebServerBase {
     this.preParser = getOptionalStringConfig('pre-parser', null)
     this.parser = getOptionalStringConfig('parser', ThymeleafTemplateParser.DEFAULT_ADDRESS)
     this.config.putBoolean('route_matcher', true)
+
+    container.deployWorkerVerticle('groovy:io.vertx.mods.thymeleaf.ThymeleafTemplateParser', config, 1, false)
+
+    // NB can't use Java's super. inside a Closure
+    super.start(result)
   }
 
-  protected final RouteMatcher routeMatcher() {
+  @Override
+  protected RouteMatcher routeMatcher() {
 
     def rm = new RouteMatcher()
     rm.allWithRegEx(regex, { HttpServerRequest req->
 
       JsonObject msg = new JsonObject()
-      msg.putString('templateName', req.path.replaceAll(regex, match))
-      msg.putString('method', req.method)
-      msg.putString('path', req.path)
-      msg.putString('query', req.query)
-      msg.putString('uri', req.uri)
+      msg.putString('templateName', req.path().replaceAll(regex, match))
+      msg.putString('method', req.method())
+      msg.putString('path', req.path())
+      msg.putString('query', req.query())
+      msg.putString('uri', req.uri())
       msg.putObject('params', new JsonObject(new HashMap<String,Object>(req.params())))
       msg.putObject('headers', new JsonObject(new HashMap<String,Object>(req.headers())))
 
       if (!!this.preParser) {
-        sendToPreParserEndReply(req, msg)
+        sendToPreParserFirst(req, msg)
       }
       else {
         handleRequest(req, msg)
@@ -81,32 +85,32 @@ class ThymeleafWebServer extends WebServerBase {
     } as Handler)
 
     // send all non-matches to the webserver
-    rm.noMatch(new StaticHttpResourceHandler(vertx.fileSystem(), getWebRootPrefix(), getIndexPage(), isGzipFiles()))
+    rm.noMatch(staticHandler())
 
     return rm
   }
 
-  private final void handleRequest(HttpServerRequest req, JsonObject msg) {
-    def internal = this.&sendToParserEndReply
-    def callback = internal.curry(req)
-    getRequestParameters(msg, callback)
-  }
-
-  private final void sendToPreParserEndReply(HttpServerRequest req, JsonObject msg) {
+  private final void sendToPreParserFirst(HttpServerRequest req, JsonObject msg) {
     vertx.eventBus().send(preParser, msg, { Message event->
-      def reply = event.body as JsonObject
+      def reply = event.body() as JsonObject
       handleRequest(req, reply)
     } as Handler)
   }
 
-  private final void sendToParserEndReply(HttpServerRequest req, JsonObject msg) {
+  private final void handleRequest(HttpServerRequest req, JsonObject msg) {
+    def internal = this.&sendToParserAndReply
+    def callback = internal.curry(req)
+    getRequestParameters(msg, callback)
+  }
+
+  private final void sendToParserAndReply(HttpServerRequest req, JsonObject msg) {
     vertx.eventBus().send(parser, msg, { Message event->
 
-      def body = ((JsonObject) event.body).toMap()
+      def body = ((JsonObject) event.body()).toMap()
       int statusCode = body['status'] as int
       String chunk = body['rendered']
-      req.response.statusCode = statusCode
-      req.response.end(chunk)
+      req.response().setStatusCode statusCode
+      req.response().end(chunk)
 
     } as Handler)
   }

@@ -1,11 +1,14 @@
-load('vertx.js')
+var vertx = require('vertx')
+var http = require('http')
+var eb = require('event_bus')
 
+var httpPort = 7080
 
-var server = vertx.createHttpServer().requestHandler(function(req) {
+var server = http.createHttpServer().requestHandler(function(req) {
 
   var json = {
-    templateName: req.path,
-    uri: req.uri,
+    templateName: req.path(),
+    uri: req.uri(),
     params: req.params(),
     headers: req.headers(),
     hello: 'world',
@@ -19,9 +22,9 @@ var server = vertx.createHttpServer().requestHandler(function(req) {
     ]
   }
 
-  vertx.eventBus.send('vertx.thymeleaf.parser', json, function(reply) {
+  eb.send('vertx.thymeleaf.parser', json, function(reply) {
     req.response.statusCode = reply.status
     req.response.end(reply.rendered)
   })
 
-}).listen(7080)
+}).listen(httpPort, '127.0.0.1')

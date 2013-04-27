@@ -20,8 +20,8 @@ The following example uses Javascript to configure a simple webserver, for each 
     var server = vertx.createHttpServer().requestHandler(function(req) {
 
       var json = {
-        templateName: req.path,
-        uri: req.uri,
+        templateName: req.path(),
+        uri: req.uri(),
         params: req.params(),
         headers: req.headers(),
         hello: 'world',

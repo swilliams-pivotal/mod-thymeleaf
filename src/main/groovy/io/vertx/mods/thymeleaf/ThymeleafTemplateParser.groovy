@@ -58,11 +58,6 @@ public class ThymeleafTemplateParser extends Verticle {
 
     this.address = container.config['address'] ?: DEFAULT_ADDRESS
     this.templateDir = container.config['templateDir'] ?: DEFAULT_TEMPLATE_DIR
-    // String templateMode = container.config['templateMode'] ?: 'HTML5'
-
-    // boolean cacheable = container.config['cacheable'] as boolean ?: true
-    // String characterEncoding = container.config['characterEncoding'] ?: 'UTF-8'
-    // String suffix = container.config['suffix'] ?: '.html'
 
     def templateResolver = new ClassLoaderTemplateResolver()
     templateResolver.cacheable = container.config['cacheable'] as boolean ?: true

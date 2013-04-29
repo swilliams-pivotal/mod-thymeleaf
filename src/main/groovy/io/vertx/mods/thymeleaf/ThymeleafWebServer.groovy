@@ -16,8 +16,8 @@
 
 package io.vertx.mods.thymeleaf
 
-import org.vertx.mods.StaticFileHandler
-import org.vertx.mods.WebServerBase
+import org.vertx.mods.web.StaticFileHandler
+import org.vertx.mods.web.WebServerBase
 
 import java.util.HashMap
 
